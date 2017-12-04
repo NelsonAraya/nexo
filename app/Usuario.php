@@ -26,4 +26,12 @@ class Usuario extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function nexos(){
+        return $this->hasMany(Nexo::class);
+    }
+
+    public function asistencias(){
+        return $this->hasMany(Asistencia::class);
+    }
 }

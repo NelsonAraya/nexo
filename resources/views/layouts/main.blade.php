@@ -11,7 +11,15 @@
     <title>{{ config('app.name') }}</title>
 
     <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('plugins/jquery-ui-1.12.1/jquery-ui.min.css') }}">
     <link href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('plugins/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <style type="text/css">
+        .ui-autocomplete {
+            z-index: 5000;
+        }
+    </style>
+
 </head>
 <body>
     <div id="app">
@@ -20,7 +28,10 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('plugins/jquery/jquery-3.2.1.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="{{ asset('plugins/jquery-ui-1.12.1/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/js/jquery.dataTables.min.js') }}"></script>
+    @yield('js')
 </body>
 </html>

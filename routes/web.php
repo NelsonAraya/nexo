@@ -20,4 +20,8 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::resource('nexo', 'NexoController');
+Route::get('vol/busqueda', 'NexoController@busqueda');
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::post('nexo/{nexo}/asistencia', 'NexoController@usuario')->name('nexo.usuario');
