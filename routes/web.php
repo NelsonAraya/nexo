@@ -22,6 +22,10 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::resource('nexo', 'NexoController');
 Route::get('vol/busqueda', 'NexoController@busqueda');
+Route::get('vol/busquedaActivo', 'NexoController@busquedaActivo');
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::post('nexo/{nexo}/asistencia', 'NexoController@usuario')->name('nexo.usuario');
+Route::post('nexo/{nexo}/grupo', 'NexoController@grupo')->name('nexo.grupo');
+Route::get('nexo/{nexo}/voluntarios', 'NexoController@voluntarios')->name('nexo.voluntarios');
+Route::get('nexo/{nexo}/gruponexo', 'NexoController@grupoNexo')->name('nexo.gruponexo');

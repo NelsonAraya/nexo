@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class TablaAsistencias extends Migration
+class TablaGrupos extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,16 @@ class TablaAsistencias extends Migration
      */
     public function up()
     {
-        Schema::create('asistencias', function (Blueprint $table) {
+        Schema::create('grupos', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('nombre',150);
+            $table->string('funcion',150);
+            $table->integer('obac')->unsigned();
+            $table->foreign('obac')->references('id')->on('usuarios');
             $table->integer('nexo_id')->unsigned();
             $table->foreign('nexo_id')->references('id')->on('nexos');
-            $table->integer('usuario_id')->unsigned();
-            $table->foreign('usuario_id')->references('id')->on('usuarios');
             $table->integer('estado_id')->unsigned();
-            $table->foreign('estado_id')->references('id')->on('estados_asistencias');
+            $table->foreign('estado_id')->references('id')->on('estados_grupos');
             $table->timestamps();
         });
     }
@@ -32,6 +34,6 @@ class TablaAsistencias extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('asistencias');
+        Schema::dropIfExists('grupos');
     }
 }

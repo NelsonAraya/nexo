@@ -15,7 +15,7 @@ class Usuario extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'nombres', 'rol', 'apellidop','apellidom',
     ];
 
     /**
@@ -26,7 +26,10 @@ class Usuario extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
+    public function NombreSimple(){
+        $porcion = explode(' ',$this->nombres);
+        return $porcion[0].' '.$this->apellidop.' '.$this->apellidom;
+    }
     public function nexos(){
         return $this->hasMany(Nexo::class);
     }
