@@ -5,12 +5,15 @@
     <div class="panel panel-primary">
         <div class="panel-heading">NEXO</div>
         <div class="panel-body">
-          <form name="nexo" method="POST" action="{{ route('nexo.store') }}">
+          <form name="nexo" method="POST" action="{{ route('nexo.update',$nexo->id) }}">
+            
             {{ csrf_field() }}
+            {{ method_field('PUT') }}
+
           	<div class="form-group row">
           		<div class="col-md-2">
           			<label for="rol">Nexo:</label>
-          			{{ $nexo->usuario->nombres }}
+          			{{ $nexo->usuario->NombreSimple() }}
           		</div>
           		<div class="col-md-3">
           			<label for="dire">DIRECCION:</label>
@@ -29,16 +32,71 @@
                 </label>
           		</div>
               <div class="col-md-3">
-                <label for="obac_cbi">OBAC CBI:</label>
-                <input type="text" name="obac_cbi" class="form-control" autocomplete="off">
+                <label for="">OBAC CIA:</label>
+                @if(!empty($nexo->obac_cia))
+                {{ $nexo->obac_cia->NombreSimple() }}
+                @endif
               </div>
-          	</div>
+            </div>  
+            <div class="form-group row">
+                <div class="col-md-3">
+                   <label for="obac_cia">OBAC CIA:</label>
+                   <input type="text" id="obac_cia" name="obac_cia" class="form-control" autocomplete="off">
+                </div>
+                <div class="col-md-3">
+                  <label for="obac_cbi">OBAC CBI:</label>
+                  <input type="text" name="obac_cbi" class="form-control" autocomplete="off" value="{{ $nexo->obac_cbi }}">
+                </div>
+                 <div class="col-md-2">
+                    <label for="modificar">Modificar</label>
+                    <button type="submit" id="modificar" class="irux btn btn-success btn-block" id="modificar">Modificar</button>
+                 </div>
+                 <div class="col-md-2">
+                    <label>Finalizar</label>
+                    <a href="{{ route('nexo.finalizar',$nexo->id) }}" class="irux btn btn-danger btn-block" role="button">Finalizar</a>
+                 </div>
+            </div> 
+           </form> 
             <div class="btn-group">
               <a id="btn_ver_grupo" class="btn btn-success" data-toggle="modal" data-target="#grupos_detalle" role="button">GRUPOS</a>
               <a id="btn_ver_asis" class="btn btn-info" data-toggle="modal" data-target="#asistencia" role="button">ASISTENCIA</a>
-              <a href="#" class="btn btn-primary" role="button">INVENTARIO</a>
+              <a href="#" class="btn btn-primary" role="button">MATERIAL MENOR</a>
             </div>
-          </form>
+            <form name="nexo" method="POST" action="{{ route('nexo.observacion',$nexo->id) }}">
+                {{ csrf_field() }}
+              <div class="form-group row">
+                  <div class="col-md-6">
+                    <label for="obs">OBSERVACIONES</label>
+                    <textarea class="form-control" rows="5" id="obs" name="obs" style="overflow:auto;resize:none"></textarea>
+                  </div>
+                  <div class="col-md-1">
+                    <label for="agregarobs">Agregar</label>
+                    <button type="submit" class="irux btn btn-success" id="agregarobs">Agregar</button>
+                  </div>
+              </div>
+            </form>  
+            <div class="form-group row">
+              <div class="col-md-6">
+                <table id="tbl_obs" class="table">
+                  <thead>
+                    <tr>
+                      <th>HORA</th>
+                      <th>OBSERVACIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @isset($obs)
+                      @foreach($obs as $row)
+                        <tr>
+                          <td>{{ $row->created_at }}</td>
+                          <td>{{ $row->obs }}</td>
+                        </tr>
+                      @endforeach
+                    @endisset
+                  </tbody>
+                </table>
+              </div>
+            </div>
         </div>
     </div>
 
@@ -70,7 +128,7 @@
                 <div class="form-group row">
                   <div class="col-md-2">
                     <label for="b_guardar">GUARDAR:</label>
-                    <button id="btn_team" type="submit" class="btn btn-primary">Guardar</button>
+                    <button id="btn_team" type="submit" class="irux btn btn-primary">Guardar</button>
                   </div>
                 </div>
               </form>
@@ -92,14 +150,15 @@
             <h4 class="modal-title">Grupos NEXOS</h4>
           </div>
           <div class="modal-body">
-              <a id="btn_grupos" class="btn btn-success" data-toggle="modal" 
+              <a id="btn_grupos" class="irux btn btn-success" data-toggle="modal" 
               data-target="#grupos" role="button">Crear Grupo</a>
               <table id="tbl_grupos" class="table">
                       <thead>
                         <tr>
-                          <th>NOMBRE</th>
+                          <th>TEAM</th>
                           <th>OBAC</th>
                           <th>FUNCION</th>
+                          <th>ESTADO</th>
                           <th>ACCIONES</th>
                         </tr>
                       </thead>
@@ -132,7 +191,7 @@
                   </div>
                   <div class="col-md-2">
                     <label for="btn_agregar">AGREGAR:</label>
-                    <button id="btn_asistencia" class="btn btn-success">Agregar</button>
+                    <button id="btn_asistencia" class="irux btn btn-success">Agregar</button>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -166,6 +225,11 @@
 <script>
 $(function() {
 
+    @if($nexo->estado=='T')
+     // $('.irux').prop('disabled', true);
+      $('.irux').attr('disabled', true);
+    @endif
+
     var table = $('#tbl_asistencia').DataTable({
        "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json"
@@ -184,6 +248,15 @@ $(function() {
         "searching": false
     });
 
+    var table3 = $('#tbl_obs').DataTable({
+       "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json"
+            },
+        "ordering": false,
+        "paging": false,
+        "searching": false
+    });    
+
     $("#vol").autocomplete({
     source: "{{ URL('vol/busqueda') }}",
     minLength: 3,
@@ -192,12 +265,22 @@ $(function() {
       $("#vol").attr("data-id", ui.item.id);
     }
   });
+
   $("#vol_activo").autocomplete({
     source: "{{ URL('vol/busquedaActivo') }}",
     minLength: 3,
     select: function(event, ui) {
       $('#vol_activo').val(ui.item.value);
       $("#vol_activo").attr("data-id", ui.item.id);
+    }
+  });
+
+  $("#obac_cia").autocomplete({
+    source: "{{ URL::route('nexo.volnexo',$nexo->id)  }}",
+    minLength: 3,
+    select: function(event, ui) {
+      $('#obac_cia').val(ui.item.value);
+      $("#obac_cia").attr("data-id", ui.item.id);
     }
   });
   
@@ -249,6 +332,7 @@ $(function() {
                   value.nombre,
                   value.usuario.nombres,
                   value.funcion,
+                  value.estado.nombre,
                   '<a href="#" class="btn btn-success justify-content-center"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a><a href="#" class="btn btn-danger justify-content-center"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>'
                 ]).draw( false );
               });
@@ -270,6 +354,11 @@ $(function() {
     $("#btn_team").click(function() {
   
       $("#vol_activo").val($("#vol_activo").data("id"));
+    });
+
+    $("#modificar").click(function() {
+  
+      $("#obac_cia").val($("#obac_cia").data("id"));
     });
 });
 </script>

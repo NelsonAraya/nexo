@@ -14,4 +14,12 @@ class Nexo extends Model
         return $this->belongsTo(Usuario::class);
     }
 
+    public function observaciones(){
+        return $this->hasMany(Observacion::class);
+    }
+
+    public function obac_cia(){
+        return $this->belongsTo(Usuario::class,'obac','id');
+    }
+
 }

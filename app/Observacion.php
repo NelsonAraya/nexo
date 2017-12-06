@@ -1,0 +1,16 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Observacion extends Model
+{
+    protected $table = "observaciones";
+
+    protected $fillable =['obs','nexo_id'];
+
+    public function nexo(){
+        return $this->belongsTo(Nexo::class);
+    }
+}

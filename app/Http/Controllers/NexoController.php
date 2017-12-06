@@ -7,6 +7,7 @@ use App\Nexo;
 use App\Usuario;
 use App\Asistencia;
 use App\Grupo;
+use App\Observacion;
 
 class NexoController extends Controller
 {
@@ -39,13 +40,22 @@ class NexoController extends Controller
      */
     public function store(Request $request)
     {
+        
         $nexo = new Nexo($request->all());
-        $usu = Usuario::where('rol',$request->rol)->get();
-        $nexo->usuario_id=$usu[0]->id;
+        $usu = Usuario::where('rol',$request->rol)->first();
+        $nexo->usuario_id=$usu->id;
         $nexo->estado='A';
         $nexo->save();
+        
+        $obs = new Observacion();
+        $obs->obs="Nexo Creado por ".$usu->NombreSimple();
+        $obs->nexo_id= $nexo->id;
+        $obs->save();
+
         flash('Nexo Creado Correctamente')->success();
         return redirect()->route('nexo.index');
+        
+
     }
 
     /**
@@ -68,10 +78,10 @@ class NexoController extends Controller
     public function edit($id)
     {
         $n= Nexo::find($id);
-        //$asistencia = Asistencia::where('nexo_id',$id)->get();
+        $obs = Observacion::where('nexo_id',$id)->orderBy('id','DESC')->get();
         return view ('nexo.edit')
-                    ->with('nexo',$n);
-           //         ->with('asistencia',$asistencia);
+                    ->with('nexo',$n)
+                    ->with('obs',$obs);
     }
 
     /**
@@ -83,7 +93,18 @@ class NexoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $nexo = Nexo::Find($id);
+        $nexo->obac=$request->obac_cia;
+        $nexo->obac_cbi=$request->obac_cbi;
+        $nexo->save();
+
+        $obs = new Observacion();
+        $obs->obs="Nexo Actualizado";
+        $obs->nexo_id= $id;
+        $obs->save();
+
+        return redirect()->route('nexo.edit',$id);
+
     }
 
     /**
@@ -111,6 +132,12 @@ class NexoController extends Controller
         $asis->usuario_id=$request->vol;
         $asis->estado_id=1;
         $asis->save();
+
+        $usu = Usuario::find($request->vol);
+        $obs = new Observacion();
+        $obs->obs="Asistencia Registrada ".$usu->NombreSimple();
+        $obs->nexo_id= $id;
+        $obs->save();
 
         return redirect()->route('nexo.edit',$id)
                     ->with('modal_asis',1);
@@ -182,6 +209,12 @@ class NexoController extends Controller
         $asis->estado_id=2;
         $asis->save();
 
+        $obs = new Observacion();
+        $obs->obs="Grupo ".$grupo->nombre." creado FUNCION ".$grupo->funcion;
+        $obs->nexo_id= $id;
+        $obs->save();
+
+
         return redirect()->route('nexo.edit',$id)
                     ->with('modal_grupo',1);
     }
@@ -195,6 +228,46 @@ class NexoController extends Controller
         }
         return response()->json($grupo);
 
+    }
+    
+    public function observacion(Request $request, $id){
+       
+       $obs = New Observacion($request->all());
+       $obs->nexo_id=$id;
+       $obs->save();
+
+        return redirect()->route('nexo.edit',$id);
+    }
+
+    public function busquedaNexo(Request $request,$id){
+
+        $search = $request->term;
+        $usu = Asistencia::join('usuarios','asistencias.usuario_id','=','usuarios.id')
+                ->select('usuarios.*')->where('asistencias.nexo_id',$id)
+                ->where('usuarios.nombres','LIKE','%'.$search.'%')->get();
+       
+        $data = [];
+
+        foreach ($usu as $key => $value) {
+           // $value->nombres = $value->NombreSimple(); 
+            $data [] = ['id'=> $value->id, 'value'=> $value->nombres];       
+        }
+        return response()->json($data);
+
+    }
+
+    public function finalizar($id){
+
+        $nexo=Nexo::Find($id);
+        $nexo->estado='T';
+        $nexo->save();
+
+        $obs = new Observacion();
+        $obs->obs="Nexo Finalizado";
+        $obs->nexo_id= $id;
+        $obs->save();
+
+        return redirect()->route('home');
     }
 
 }

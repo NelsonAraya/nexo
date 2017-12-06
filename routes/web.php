@@ -29,3 +29,7 @@ Route::post('nexo/{nexo}/asistencia', 'NexoController@usuario')->name('nexo.usua
 Route::post('nexo/{nexo}/grupo', 'NexoController@grupo')->name('nexo.grupo');
 Route::get('nexo/{nexo}/voluntarios', 'NexoController@voluntarios')->name('nexo.voluntarios');
 Route::get('nexo/{nexo}/gruponexo', 'NexoController@grupoNexo')->name('nexo.gruponexo');
+
+Route::post('nexo/{nexo}/obs', 'NexoController@observacion')->name('nexo.observacion');
+Route::get('vol/busquedaNexo/{id}', 'NexoController@busquedaNexo')->name('nexo.volnexo');
+Route::get('nexo/{nexo}/finalizar', 'NexoController@finalizar')->name('nexo.finalizar');
